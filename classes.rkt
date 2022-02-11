@@ -1,10 +1,11 @@
 #lang racket
+
 #|
 
 Lucas Piazzi de Castro - 201635003
 Cristiano Nascimento da Silva - 201635029
 
-**************************************************
+*********************** IERF ***************************
 
 σ => denota um estado (memória, ou store)
 [l = v]σ => um estado que é igual a σ, exceto que no location l tem o valor v
@@ -127,12 +128,25 @@ apply-env :: Env x Var -> Value |#
         [(equal? type 'begin) (foldr (lambda (e acumulador) (value-of e Δ)) (value-of (cadr exp) Δ) (cddr exp))] 
 
         ;Exp implementadas para o trabalho
-        [(equal? type 'super) (error "A") ]
-        [(equal? type 'self ) (error "A")]
-        [(equal? type 'new) (error "A") ]
-        [(equal? type 'send) (error "A") ] 
+        [(equal? type 'super) (error "Falta Implementar") ]
+        [(equal? type 'self ) (error "Falta Implementar")]
+        [(equal? type 'new) (error "Falta Implementar") ]
+        [(equal? type 'send) (error "Falta Implementar") ] 
        
         
         [else (error "operação não existe")])
 
   )
+
+; ********** CLASSES **********
+
+; Struct da classe, cada classe vai conter uma superclass, membros e metodos
+(struct class (classname super members method-env))
+
+; Struct do metodo, cada metodo possui um nome (method name), parametros (method parameters) e corpo (method body)
+(struct method (method-body method-name method-parameters))
+
+; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
+(struct object (classname fields-refs))
+
+
