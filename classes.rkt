@@ -128,7 +128,7 @@ apply-env :: Env x Var -> Value |#
         [(equal? type 'begin) (foldr (lambda (e acumulador) (value-of e Δ)) (value-of (cadr exp) Δ) (cddr exp))] 
 
         [(equal? type 'super) (error "Falta Implementar") ]
-        [(equal? type 'self ) (error "Falta Implementar")]
+        [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
         [(equal? type 'new) (error "Falta Implementar") ]
         [(equal? type 'send) (error "Falta Implementar") ] 
        
@@ -137,7 +137,7 @@ apply-env :: Env x Var -> Value |#
 
   )
 
-; ********** CLASSES **********
+; ********** Cap 9. CLASSES **********
  
 ; Struct da classe, cada classe vai conter uma superclass, membros e metodos
 (struct class (classname super-name field-names method-env))
@@ -147,6 +147,9 @@ apply-env :: Env x Var -> Value |#
 
 ; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
 (struct object (classname fields-refs))
+
+
+; ********** Cap 9.4.3 Classes and Class Environments **********
 
 ;Nossa implementação depende da capacidade de obter informações sobre uma classe a partir de seu nome.
 ;Portanto, precisamos de um ambiente de classes para realizar essa tarefa.
@@ -183,5 +186,45 @@ apply-env :: Env x Var -> Value |#
     (cond
       ((null? super-fields) child-fields) ; <-- tratar campos duplicados, e usar o campo do filho como o certo
    )
-  ))
+))
 
+
+; ********** Cap 9.4.4 Methods Environments **********
+
+; Cria o método 
+(define create-method
+  (λ (method-decl super-name field-names)
+    (let ([method-name  (car method-decl)])
+      (cons method-name (method (cddr method-decl) super-name field-names))
+      ) )
+ )
+
+; Define o ambiente 
+(define create-methods-env
+  (λ(methods-decls super-name fields method-env)
+    (if (empty? methods-decls) method-env
+    (create-methods-env-aux methods-decls super-name fields method-env))
+ ))
+
+; Coloca os métodos em uma list
+(define create-methods-env-aux
+ (λ(method-decl super-name fields method-env)
+   (set! method-env (append (list (create-method (cdar method-decl) super-name fields) )
+           method-env) )
+   (create-methods-env (cdr method-decl) super-name fields method-env)
+   )
+  )
+
+
+; Procura pelo método na lista de methods, se não encontrar retorna um erro;
+(define find-method
+  (λ (class-name method-name)
+    (let ((method-env (class-method-env (get-class class-name the-class-env))))
+      (let ((maybe-pair (assq method-name method-env)))
+        (if (pair? maybe-pair) maybe-pair
+            (display 'metodo-nao-existe)
+         )
+        )
+      )
+    )
+ )
