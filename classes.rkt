@@ -127,7 +127,6 @@ apply-env :: Env x Var -> Value |#
         
         [(equal? type 'begin) (foldr (lambda (e acumulador) (value-of e Δ)) (value-of (cadr exp) Δ) (cddr exp))] 
 
-        ;Exp implementadas para o trabalho
         [(equal? type 'super) (error "Falta Implementar") ]
         [(equal? type 'self ) (error "Falta Implementar")]
         [(equal? type 'new) (error "Falta Implementar") ]
@@ -139,9 +138,9 @@ apply-env :: Env x Var -> Value |#
   )
 
 ; ********** CLASSES **********
-
+ 
 ; Struct da classe, cada classe vai conter uma superclass, membros e metodos
-(struct class (classname super members method-env))
+(struct class (classname super-name field-names method-env))
 
 ; Struct do metodo, cada metodo possui um nome (method name), parametros (method parameters) e corpo (method body)
 (struct method (method-body method-name method-parameters))
@@ -149,4 +148,40 @@ apply-env :: Env x Var -> Value |#
 ; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
 (struct object (classname fields-refs))
 
+;Nossa implementação depende da capacidade de obter informações sobre uma classe a partir de seu nome.
+;Portanto, precisamos de um ambiente de classes para realizar essa tarefa.
+;O ambiente de classe associará cada nome de classe a uma estrutura de dados que descreve a classe
+(define the-class-env '()) ; <- representa uma lista de classes
+
+; Adiciona uma classe ao ambiente de classes
+(define add-class-to-env
+  (λ (name obj_class)
+    (set! the-class-env (append (list (cons name obj_class))
+          the-class-env) )
+    )
+ )
+
+(define lookup-class
+  (lambda (name)
+    (let ((maybe-pair (assq name the-class-env)))
+      (if maybe-pair (cadr maybe-pair)
+          (display name)))))
+
+; Retorna uma classe do ambiente de classes
+(define (get-class name classes-list)
+     (if (empty? classes-list) (void)
+     (if (equal? name (caar classes-list)) (cdar classes-list)   ; Procurar na lista de classes o struct dado o nome
+         (get-class name (cdr classes-list)))
+     )
+ )
+
+
+;O procedimento append-field-name é usado para criar os nomes de campo para a classe atual.
+;Acrescenta os campos da superclasse e os campos declarados pela nova classe
+(define append-field-names
+  (λ (super-fields child-fields)
+    (cond
+      ((null? super-fields) child-fields) ; <-- tratar campos duplicados, e usar o campo do filho como o certo
+   )
+  ))
 
