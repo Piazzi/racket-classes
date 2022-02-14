@@ -189,6 +189,34 @@ apply-env :: Env x Var -> Value |#
 ))
 
 
+; Retorna o nome dos campos de uma classe que esteja no ambiente de classes
+(define get-field-names
+ (lambda(class-name)
+  ((get-class class-name the-class-env))
+   )
+ )
+
+; Inicializa uma classe, adicionando ela e seus campos no ambiente
+(define initialize-class-decl
+(lambda (decl)
+  ;(display (cadr decl)) -- class-name
+ ; (display (caddr decl)) ;-- super-clas-name
+  ;(display (cdr (cadddr decl))) -- fields names
+ ; (display  (cadddr (cdr decl))) ;-- methods namses
+  
+  (let ([correct-fields (append-field-names (get-field-names (caddr decl)) (cdr (cadddr decl)))] 
+        [method-env (append (class-method-env (get-class (caddr decl) the-class-env)) (create-methods-env (cadddr (cdr decl)) (caddr decl) (cdr (cadddr decl)) '())  ) ])
+    (add-class-to-env (cadr decl) ( class (cadr decl) (caddr decl) correct-fields method-env )) ))
+  )
+
+;Inicializa o ambiente de classes, chamanado initialize-class-decl para todoas as classes no ambiente
+(define initialize-class-env
+  (lambda (classes-decls)
+    (add-class-to-env 'object (class 'object 'object null null))
+    (map initialize-class-decl classes-decls))
+ )
+
+
 ; ********** Cap 9.4.4 Methods Environments **********
 
 ; Cria o método 
@@ -228,3 +256,4 @@ apply-env :: Env x Var -> Value |#
       )
     )
  )
+
