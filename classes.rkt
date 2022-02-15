@@ -98,7 +98,6 @@ apply-env :: Env x Var -> Value |#
   (proc val #f))
 
 
-; ----------- value-of exp . Base IREF + operacoes: New, Super, Send, Self e Begin
 (struct thunk (env exp))
 
   (define (value-of exp Δ)
@@ -137,6 +136,13 @@ apply-env :: Env x Var -> Value |#
         [else (error "operação não existe")])
 
   )
+
+; função auxiliar do livro
+(define values-of-exps
+    (lambda (exps env)
+      (map
+        (lambda (exp) (value-of exp env))
+        exps)))
 
 ; ********** Cap 9. CLASSES **********
  
@@ -190,7 +196,7 @@ apply-env :: Env x Var -> Value |#
 ))
 
 
-; Retorna o nome dos campos de uma classe que esteja no ambiente de classes
+; Retorna o nome dos campos de uma classe que esteja no ambiente de classes / overwrite de funções da super class
 (define get-field-names
  (λ(class-name)
   (get-class class-name the-class-env)
@@ -267,7 +273,29 @@ apply-env :: Env x Var -> Value |#
               (class c4 c3 (fields xxxx yyyy zzzz )((method initialize() (lit 4 ))))
             ))
 
-(define methods '(( method initialize()(v1 lit 1)) (method test() (lit 1 )) ))
+(define methods '(( method initialize()(v1 lit 1)) (method test() (lit 1 ) (method self())) ))
 
 ; inicia o ambiente com as classes criadas anteriormente
-(initialize-class-env example) 
+(initialize-class-env example)
+
+
+; define novo objeto
+(define new-object
+(lambda (class-name)
+  (object
+   class-name
+   (map
+    (lambda (field-name)
+      (newref (list 'uninitialized-field field-name)))
+    (get-field-names class-name)))))
+
+(define (value-of-classes-program prog )
+  (empty-store)
+  (initialize-class-env (cadr prog)) ; ClassDecl
+  ;(value-of (cadr prog init-env)) ; Body Expr
+)
+
+(define (value-of-program prog)
+  (empty-store)
+  (value-of (cadr prog) init-env))
+
