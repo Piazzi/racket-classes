@@ -139,7 +139,7 @@ apply-env :: Env x Var -> Value |#
 
 ; ********** Cap 9. CLASSES **********
  
-; Struct da classe, cada classe vai conter uma superclass, membros e metodos
+; Struct da classe, cada classe vai conter o nome de sua classe, uma superclass, membros e metodos
 (struct class (classname super-name field-names method-env))
 
 ; Struct do metodo, cada metodo possui um nome (method name), parametros (method parameters) e corpo (method body)
@@ -209,7 +209,7 @@ apply-env :: Env x Var -> Value |#
     (add-class-to-env (cadr decl) ( class (cadr decl) (caddr decl) correct-fields method-env )) ))
   )
 
-;Inicializa o ambiente de classes, chamanado initialize-class-decl para todoas as classes no ambiente
+;Inicializa o ambiente de classes, chamando initialize-class-decl para todoas as classes no ambiente
 (define initialize-class-env
   (lambda (classes-decls)
     (add-class-to-env 'object (class 'object 'object null null))
