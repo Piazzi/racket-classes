@@ -1,5 +1,6 @@
 #lang racket
-
+(require racket/trace)
+;Calltrace is a tool that displays all calls to user procedures. It displays the arguments to the calls, and it indents to show the depth of the continuation.
 #|
 
 Lucas Piazzi de Castro - 201635003
@@ -192,21 +193,21 @@ apply-env :: Env x Var -> Value |#
 ; Retorna o nome dos campos de uma classe que esteja no ambiente de classes
 (define get-field-names
  (lambda(class-name)
-  ((get-class class-name the-class-env))
+  (get-class class-name the-class-env)
    )
  )
 
 ; Inicializa uma classe, adicionando ela e seus campos no ambiente
 (define initialize-class-decl
 (lambda (decl)
-  ;(display (cadr decl)) -- class-name
- ; (display (caddr decl)) ;-- super-clas-name
-  ;(display (cdr (cadddr decl))) -- fields names
- ; (display  (cadddr (cdr decl))) ;-- methods namses
+  (display (cadr decl)) ;class-name
+  (display (caddr decl)) ;super-clas-name
+  (display (cdr (cadddr decl))) ;fields names
+  (display  (cadddr (cdr decl))) ;method env (methods names)
   
-  (let ([correct-fields (append-field-names (get-field-names (caddr decl)) (cdr (cadddr decl)))] 
-        [method-env (append (class-method-env (get-class (caddr decl) the-class-env)) (create-methods-env (cadddr (cdr decl)) (caddr decl) (cdr (cadddr decl)) '())  ) ])
-    (add-class-to-env (cadr decl) ( class (cadr decl) (caddr decl) correct-fields method-env )) ))
+  (let ([fields (append-field-names (get-field-names (caddr decl)) (cdr (cadddr decl)))] 
+        [method-env (append (get-class (caddr decl) the-class-env) (create-methods-env (cadddr (cdr decl)) (caddr decl) (cdr (cadddr decl)) '())  ) ])
+    (add-class-to-env (cadr decl) ( class (cadr decl) (caddr decl) fields method-env )) ))
   )
 
 ;Inicializa o ambiente de classes, chamando initialize-class-decl para todoas as classes no ambiente
@@ -257,3 +258,14 @@ apply-env :: Env x Var -> Value |#
     )
  )
 
+; ********** Testes **********
+
+(define example '(
+            (class c1 object (fields x y)  (( method initialize()(v1 lit 1)) (method test() (lit 2 )) ))
+             (class c2 classe1 (fields xx yy)  ((method initialize(2) (lit 2 ))))
+             (class c3 classe2 (fields xxx yyy zzz )  ((method initialize() (lit 3 ))))
+            ))
+
+(define methods '(( method initialize()(v1 lit 1)) (method test() (lit 1 )) ))
+
+(initialize-class-env example)
