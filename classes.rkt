@@ -206,7 +206,7 @@ apply-env :: Env x Var -> Value |#
   (display  (cadddr (cdr decl))) ;method env (methods names)
   
   (let ([fields (append-field-names (get-field-names (caddr decl)) (cdr (cadddr decl)))] 
-        [method-env (append (get-class (caddr decl) the-class-env) (create-methods-env (cadddr (cdr decl)) (caddr decl) (cdr (cadddr decl)) '())  ) ])
+        [method-env (append (class-method-env(get-class (caddr decl) the-class-env)) (create-methods-env (cadddr (cdr decl)) (caddr decl) (cdr (cadddr decl)) '())  ) ])
     (add-class-to-env (cadr decl) ( class (cadr decl) (caddr decl) fields method-env )) ))
   )
 
@@ -261,12 +261,13 @@ apply-env :: Env x Var -> Value |#
 ; ********** Testes **********
 
 (define example '(
-            (class c1 object (fields x y)  (( method initialize()(v1 lit 1)) (method test() (lit 2 )) ))
-             (class c2 c1 (fields xx yy)  ((method initialize(2) (lit 2 ))))
-             (class c3 c2 (fields xxx yyy zzz )  ((method initialize() (lit 3 ))))
-              (class c4 c3 (fields xxxx yyyy zzzz )  ((method initialize() (lit 4 ))))
+            (class c1 object (fields x y)(( method initialize()(v1 lit 1)) (method test() (lit 2 )) )) ; uses the object as super class
+             (class c2 c1 (fields xx yy)((method initialize(2) (lit 2 ))))
+             (class c3 c2 (fields xxx yyy zzz )((method initialize() (lit 3 ))))
+              (class c4 c3 (fields xxxx yyyy zzzz )((method initialize() (lit 4 ))))
             ))
 
 (define methods '(( method initialize()(v1 lit 1)) (method test() (lit 1 )) ))
 
-(initialize-class-env example)
+; inicia o ambiente com as classes criadas anteriormente
+(initialize-class-env example) 
