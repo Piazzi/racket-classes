@@ -166,7 +166,7 @@ apply-env :: Env x Var -> Value |#
  )
 
 (define lookup-class
-  (lambda (name)
+  (λ (name)
     (let ((maybe-pair (assq name the-class-env)))
       (if maybe-pair (cadr maybe-pair)
           (display name)))))
@@ -192,14 +192,14 @@ apply-env :: Env x Var -> Value |#
 
 ; Retorna o nome dos campos de uma classe que esteja no ambiente de classes
 (define get-field-names
- (lambda(class-name)
+ (λ(class-name)
   (get-class class-name the-class-env)
    )
  )
 
 ; Inicializa uma classe, adicionando ela e seus campos no ambiente
 (define initialize-class-decl
-(lambda (decl)
+(λ (decl)
   (display (cadr decl)) ;class-name
   (display (caddr decl)) ;super-clas-name
   (display (cdr (cadddr decl))) ;fields names
@@ -212,7 +212,7 @@ apply-env :: Env x Var -> Value |#
 
 ;Inicializa o ambiente de classes, chamando initialize-class-decl para todoas as classes no ambiente
 (define initialize-class-env
-  (lambda (classes-decls)
+  (λ (classes-decls)
     (add-class-to-env 'object (class 'object 'object null null))
     (map initialize-class-decl classes-decls))
  )
@@ -262,8 +262,9 @@ apply-env :: Env x Var -> Value |#
 
 (define example '(
             (class c1 object (fields x y)  (( method initialize()(v1 lit 1)) (method test() (lit 2 )) ))
-             (class c2 classe1 (fields xx yy)  ((method initialize(2) (lit 2 ))))
-             (class c3 classe2 (fields xxx yyy zzz )  ((method initialize() (lit 3 ))))
+             (class c2 c1 (fields xx yy)  ((method initialize(2) (lit 2 ))))
+             (class c3 c2 (fields xxx yyy zzz )  ((method initialize() (lit 3 ))))
+              (class c4 c3 (fields xxxx yyyy zzzz )  ((method initialize() (lit 4 ))))
             ))
 
 (define methods '(( method initialize()(v1 lit 1)) (method test() (lit 1 )) ))
