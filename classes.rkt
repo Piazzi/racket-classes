@@ -150,7 +150,7 @@ apply-env :: Env x Var -> Value |#
 (struct class (classname super-name field-names method-env))
 
 ; Struct do metodo, cada metodo possui um nome (method name), parametros (method parameters) e corpo (method body)
-(struct method (method-body method-name method-parameters))
+(struct method (method-name method-parameters method-body))
 
 ; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
 (struct object (classname fields-refs))
