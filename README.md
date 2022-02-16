@@ -19,6 +19,3 @@ of the object.
 # Syntax
 ![image](https://user-images.githubusercontent.com/40416044/152166527-da3ad732-cba7-4705-bc9b-63ce3a83e719.png)
 
-# Example 
-
-![image](https://user-images.githubusercontent.com/40416044/152166675-0394c336-df41-422a-8744-f0f300f492c8.png)
