@@ -89,7 +89,7 @@ apply-env :: Env x Var -> Value |#
 (define (proc-val var exp Δ)
   (lambda (val flag)
     (if flag (value-of exp (extend-env var (newref val) Δ))
-        (value-of exp (extend-env var val Δ)))))
+        (  exp (extend-env var val Δ)))))
 
 (define (apply-proc proc val)
   (proc val #t))
@@ -127,6 +127,7 @@ apply-env :: Env x Var -> Value |#
         
         [(equal? type 'begin) (foldr (lambda (e acumulador) (value-of e Δ)) (value-of (cadr exp) Δ) (cddr exp))] 
 
+        ; ********** Novos Métodos **********
         [(equal? type 'super) (error "Falta Implementar") ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
         [(equal? type 'new) (error "Falta Implementar") ]
@@ -155,6 +156,18 @@ apply-env :: Env x Var -> Value |#
 ; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
 (struct object (classname fields-refs))
 
+; ********** Cap 9.4.1 Objects **********
+
+; define novo objeto
+(define new-object
+(lambda (class-name)
+  (object
+   class-name
+   (map
+    (lambda (field-name)
+      (newref (list 'uninitialized-field field-name)))
+    (get-field-names class-name)))))
+
 
 ; ********** Cap 9.4.3 Classes and Class Environments **********
 
@@ -171,6 +184,7 @@ apply-env :: Env x Var -> Value |#
     )
  )
 
+; função livro mas que não precisamos utilizar
 (define lookup-class
   (λ (name)
     (let ((maybe-pair (assq name the-class-env)))
@@ -279,23 +293,17 @@ apply-env :: Env x Var -> Value |#
 (initialize-class-env example)
 
 
-; define novo objeto
-(define new-object
-(lambda (class-name)
-  (object
-   class-name
-   (map
-    (lambda (field-name)
-      (newref (list 'uninitialized-field field-name)))
-    (get-field-names class-name)))))
 
+
+
+; Avalia o programa
 (define (value-of-classes-program prog )
   (empty-store)
-  (initialize-class-env (cadr prog)) ; ClassDecl
+  (initialize-class-env (cadr prog)) 
   ;(value-of (cadr prog init-env)) ; Body Expr
 )
 
-(define (value-of-program prog)
+(define (value-of-program program)
   (empty-store)
-  (value-of (cadr prog) init-env))
+  (value-of (cadr program) init-env)) ;
 
