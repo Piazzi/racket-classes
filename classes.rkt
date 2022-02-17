@@ -130,20 +130,16 @@ apply-env :: Env x Var -> Value |#
         ; ********** Novos Métodos **********
         [(equal? type 'super) (error "Falta Implementar") ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
-        [(equal? type 'new) (error "Falta Implementar") ]
+        [(equal? type 'new)  (new-object)]
         [(equal? type 'send) (error "Falta Implementar") ] 
-       
+       ; send expression consists of an expression that should evaluate to an
+       ; object, a method name, and zero or more operands. The named method
+       ; is retrieved from the class of the object, and then is passed the arguments
+       ; obtained by evaluating the operands.
         
         [else (error "operação não existe")])
 
   )
-
-; função auxiliar do livro
-(define values-of-exps
-    (lambda (exps env)
-      (map
-        (lambda (exp) (value-of exp env))
-        exps)))
 
 ; ********** Cap 9. CLASSES **********
  
@@ -160,13 +156,13 @@ apply-env :: Env x Var -> Value |#
 
 ; define novo objeto
 (define new-object
-(lambda (class-name)
+(λ(class-name)
   (object
    class-name
    (map
     (lambda (field-name)
       (newref (list 'uninitialized-field field-name)))
-    (get-field-names class-name)))))
+    (get-field-names (lookup-class class-name)))))) ; tirar o lookup-class?
 
 
 ; ********** Cap 9.4.3 Classes and Class Environments **********
@@ -184,7 +180,7 @@ apply-env :: Env x Var -> Value |#
     )
  )
 
-; função livro mas que não precisamos utilizar
+; função utilizada ao definir um objeto
 (define lookup-class
   (λ (name)
     (let ((maybe-pair (assq name the-class-env)))
@@ -294,16 +290,10 @@ apply-env :: Env x Var -> Value |#
 
 
 
-
-
-; Avalia o programa
-(define (value-of-classes-program prog )
-  (empty-store)
-  (initialize-class-env (cadr prog)) 
-  ;(value-of (cadr prog init-env)) ; Body Expr
-)
-
 (define (value-of-program program)
   (empty-store)
-  (value-of (cadr program) init-env)) ;
+  (initialize-class-env (cadr program)) ; testar com e sem essa linha
+  (value-of cadr program init-env)) ;
 
+
+value-of-program example 
