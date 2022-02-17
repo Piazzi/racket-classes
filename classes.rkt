@@ -1,8 +1,10 @@
 #lang racket
+
 (require racket/trace)
 ;Calltrace is a tool that displays all calls to user procedures. It displays the arguments to the calls, and it indents to show the depth of the continuation.
 #|
 
+Grupo:
 Lucas Piazzi de Castro - 201635003
 Cristiano Nascimento da Silva - 201635029
 
@@ -127,11 +129,22 @@ apply-env :: Env x Var -> Value |#
         
         [(equal? type 'begin) (foldr (lambda (e acumulador) (value-of e Δ)) (value-of (cadr exp) Δ) (cddr exp))] 
 
-        [(equal? type 'super) (error "Falta Implementar") ]
+        [(equal? type 'super) (let ((args (values-of-exps (caddr exp) Δ))
+                                    (obj (apply-env Δ '%self)))
+                                (apply-proc
+                                 (find-method (apply-env Δ '%super) (cadr exp))
+                                 obj
+                                 args)) ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
-        [(equal? type 'new) (error "Falta Implementar") ]
-        [(equal? type 'send) (error "Falta Implementar") ] 
-       
+        [(equal? type 'new) (new-object) ]
+        [(equal? type 'send) (let ((args (values-of-exps (cadddr exp) Δ))
+                                   (obj (value-of (cadr exp) Δ)))
+                               (apply-proc
+                                (find-method
+                                 (object (cadr exp) obj)
+                                 (caddr exp))
+                                obj
+                                args)) ]       
         
         [else (error "operação não existe")])
 
@@ -150,11 +163,22 @@ apply-env :: Env x Var -> Value |#
 (struct class (classname super-name field-names method-env))
 
 ; Struct do metodo, cada metodo possui um nome (method name), parametros (method parameters) e corpo (method body)
-(struct method (method-body method-name method-parameters))
+(struct method (method-name method-parameters method-body))
 
 ; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
 (struct object (classname fields-refs))
 
+; ********** Cap 9.4.1 Objects **********
+
+; define novo objeto
+(define new-object
+(λ(class-name)
+  (object
+   class-name
+   (map
+    (lambda (field-name)
+      (newref (list 'uninitialized-field field-name)))
+    (get-field-names (lookup-class class-name)))))) ; tirar o lookup-class?
 
 ; ********** Cap 9.4.3 Classes and Class Environments **********
 
@@ -171,7 +195,6 @@ apply-env :: Env x Var -> Value |#
     )
  )
 
-; função livro mas que não precisamos utilizar
 (define lookup-class
   (λ (name)
     (let ((maybe-pair (assq name the-class-env)))
@@ -279,24 +302,7 @@ apply-env :: Env x Var -> Value |#
 ; inicia o ambiente com as classes criadas anteriormente
 (initialize-class-env example)
 
-
-; define novo objeto
-(define new-object
-(lambda (class-name)
-  (object
-   class-name
-   (map
-    (lambda (field-name)
-      (newref (list 'uninitialized-field field-name)))
-    (get-field-names class-name)))))
-
-(define (value-of-classes-program prog )
+(define (value-of-program program)
   (empty-store)
-  (initialize-class-env (cadr prog)) ; ClassDecl
-  ;(value-of (cadr prog init-env)) ; Body Expr
-)
-
-(define (value-of-program prog)
-  (empty-store)
-  (value-of (cadr prog) init-env))
-
+  (initialize-class-env (cadr program)) ; testar com e sem essa linha
+  (value-of cadr program init-env)) ;
