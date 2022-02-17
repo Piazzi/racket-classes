@@ -180,7 +180,7 @@ apply-env :: Env x Var -> Value |#
     )
  )
 
-; função utilizada ao definir um objeto
+; função utilizada ao definir um objeto, retorna uma classe
 (define lookup-class
   (λ (name)
     (let ((maybe-pair (assq name the-class-env)))
