@@ -136,7 +136,7 @@ apply-env :: Env x Var -> Value |#
                                  obj
                                  args)) ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
-        [(equal? type 'new) (error "Falta Implementar") ]
+        [(equal? type 'new) (new-object) ]
         [(equal? type 'send) (let ((args (values-of-exps (cadddr exp) Δ))
                                    (obj (value-of (cadr exp) Δ)))
                                (apply-proc
@@ -167,6 +167,18 @@ apply-env :: Env x Var -> Value |#
 
 ; Struct do objeto, cada objeto possui o nome de sua classe e uma lista de referencias dos seus campos
 (struct object (classname fields-refs))
+
+; ********** Cap 9.4.1 Objects **********
+
+; define novo objeto
+(define new-object
+(λ(class-name)
+  (object
+   class-name
+   (map
+    (lambda (field-name)
+      (newref (list 'uninitialized-field field-name)))
+    (get-field-names (lookup-class class-name)))))) ; tirar o lookup-class?
 
 ; ********** Cap 9.4.3 Classes and Class Environments **********
 
@@ -289,17 +301,6 @@ apply-env :: Env x Var -> Value |#
 
 ; inicia o ambiente com as classes criadas anteriormente
 (initialize-class-env example)
-
-
-; define novo objeto
-(define new-object
-(lambda (class-name)
-  (object
-   class-name
-   (map
-    (lambda (field-name)
-      (newref (list 'uninitialized-field field-name)))
-    (get-field-names class-name)))))
 
 (define (value-of-classes-program prog )
   (empty-store)
