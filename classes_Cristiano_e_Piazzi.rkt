@@ -308,8 +308,6 @@ apply-env :: Env x Var -> Value |#
 ; inicia o ambiente com as classes criadas anteriormente
 (initialize-class-env example)
 
-;(let o1 (new c1()))
-;(define o1 (new c1))
 
 (define (value-of-program program)
   (empty-store)
@@ -317,10 +315,3 @@ apply-env :: Env x Var -> Value |#
   (value-of cadr program init-env)) ;
 
 ;value-of-program example
-
-(define ex1 '(let o1 (new c1())
-                      (send o1 test())))
-
-(value-of ex1 init-env)
-
-;(let o1 (new c1) (send o1 test()))
