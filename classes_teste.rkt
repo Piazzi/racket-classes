@@ -134,7 +134,7 @@ apply-env :: Env x Var -> Value |#
                                 (apply-proc
                                  (find-method (apply-env Δ '%super) (cadr exp))
                                  obj
-                                 args)) ]
+                                 args)) ] ; corresponde ao método super-call-exp() do livro
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
         [(equal? type 'new) (let ((args (values-of-exps (caddr exp) Δ))
                                   (obj (new-object (cadr exp))))
@@ -142,7 +142,7 @@ apply-env :: Env x Var -> Value |#
                                (find-method (cadr exp) 'initialize)
                                obj
                                args)
-                              obj)]
+                              obj)] ; corresponde ao método new-object-exp() do livro
         [(equal? type 'send) (let ((args (values-of-exps (cadddr exp) Δ))
                                    (obj (value-of (cadr exp) Δ)))
                                (apply-proc
@@ -150,7 +150,7 @@ apply-env :: Env x Var -> Value |#
                                  (object (cadr exp) obj)
                                  (caddr exp))
                                 obj
-                                args)) ]       
+                                args)) ] ; corresponde ao método method-call-exp() do livro
         
         [else (error "operação não existe")])
 
@@ -308,19 +308,15 @@ apply-env :: Env x Var -> Value |#
 ; inicia o ambiente com as classes criadas anteriormente
 (initialize-class-env example)
 
-;(let o1 (new c1()))
-;(define o1 (new c1))
 
 (define (value-of-program program)
   (empty-store)
   (initialize-class-env (cadr program)) ; testar com e sem essa linha
   (value-of cadr program init-env)) ;
 
-;value-of-program example
-
 (define ex1 '(let o1 (new c1())
                       (send o1 test())))
 
 (value-of ex1 init-env)
 
-;(let o1 (new c1) (send o1 test()))
+;value-of-program example
