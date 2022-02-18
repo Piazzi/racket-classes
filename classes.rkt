@@ -136,8 +136,13 @@ apply-env :: Env x Var -> Value |#
                                  obj
                                  args)) ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
-        [(equal? type 'new) (apply-proc
-                             (new-object (cadr exp))) ]
+        [(equal? type 'new) (let ((args (values-of-exps (caddr exp) Δ))
+                                  (obj (new-object (cadr exp))))
+                              (apply-proc
+                               (find-method (cadr exp) 'initialize)
+                               obj
+                               args)
+                              obj)]
         [(equal? type 'send) (let ((args (values-of-exps (cadddr exp) Δ))
                                    (obj (value-of (cadr exp) Δ)))
                                (apply-proc
