@@ -134,7 +134,7 @@ apply-env :: Env x Var -> Value |#
                                 (apply-proc
                                  (find-method (apply-env Δ '%super) (cadr exp))
                                  obj
-                                 args)) ] ; corresponde ao método super-call-exp() do livro
+                                 args)) ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
         [(equal? type 'new) (let ((args (values-of-exps (caddr exp) Δ))
                                   (obj (new-object (cadr exp))))
@@ -142,7 +142,7 @@ apply-env :: Env x Var -> Value |#
                                (find-method (cadr exp) 'initialize)
                                obj
                                args)
-                              obj)] ; corresponde ao método new-object-exp() do livro
+                              obj)]
         [(equal? type 'send) (let ((args (values-of-exps (cadddr exp) Δ))
                                    (obj (value-of (cadr exp) Δ)))
                                (apply-proc
@@ -150,7 +150,7 @@ apply-env :: Env x Var -> Value |#
                                  (object (cadr exp) obj)
                                  (caddr exp))
                                 obj
-                                args)) ] ; corresponde ao método method-call-exp() do livro
+                                args)) ]       
         
         [else (error "operação não existe")])
 

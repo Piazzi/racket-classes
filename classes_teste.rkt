@@ -314,4 +314,9 @@ apply-env :: Env x Var -> Value |#
   (initialize-class-env (cadr program)) ; testar com e sem essa linha
   (value-of cadr program init-env)) ;
 
+(define ex1 '(let o1 (new c1())
+                      (send o1 test())))
+
+(value-of ex1 init-env)
+
 ;value-of-program example
