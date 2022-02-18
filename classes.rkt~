@@ -136,8 +136,7 @@ apply-env :: Env x Var -> Value |#
                                  obj
                                  args)) ]
         [(equal? type 'self ) (apply-env Δ '%self)] ; corresponde ao método self-exp() do livro
-        [(equal? type 'new) (apply-proc
-                             (new-object (cadr exp))) ]
+        [(equal? type 'new) (new-object) ]
         [(equal? type 'send) (let ((args (values-of-exps (cadddr exp) Δ))
                                    (obj (value-of (cadr exp) Δ)))
                                (apply-proc
@@ -296,26 +295,14 @@ apply-env :: Env x Var -> Value |#
              (class c2 c1 (fields xx yy)((method initialize(2) (lit 2 ))))
              (class c3 c2 (fields xxx yyy zzz )((method initialize() (lit 3 ))))
               (class c4 c3 (fields xxxx yyyy zzzz )((method initialize() (lit 4 ))))
-              ))
+            ))
 
 (define methods '(( method initialize()(v1 lit 1)) (method test() (lit 1 ) (method self())) ))
 
 ; inicia o ambiente com as classes criadas anteriormente
 (initialize-class-env example)
 
-;(let o1 (new c1()))
-;(define o1 (new c1))
-
 (define (value-of-program program)
   (empty-store)
   (initialize-class-env (cadr program)) ; testar com e sem essa linha
   (value-of cadr program init-env)) ;
-
-;value-of-program example
-
-(define ex1 '(let o1 (new c1())
-                      (send o1 test())))
-
-(value-of ex1 init-env)
-
-;(let o1 (new c1) (send o1 test()))
